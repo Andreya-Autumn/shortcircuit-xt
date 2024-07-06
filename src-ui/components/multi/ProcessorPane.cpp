@@ -885,49 +885,63 @@ void ProcessorPane::layoutControlsVAOsc()
     clearAdditionalHamburgerComponents();
     mixEditor = createWidgetAttachedTo<jcmp::Knob>(mixAttachment, "Mix");
     addAdditionalHamburgerComponent(std::move(mixEditor->item));
-
+    
+    auto stereo = createWidgetAttachedTo<jcmp::ToggleButton>(intAttachments[0]);
+    stereo->setDrawMode(jcmp::ToggleButton::DrawMode::DUAL_GLYPH);
+    stereo->setGlyph(jcmp::GlyphPainter::STEREO);
+    stereo->setOffGlyph(jcmp::GlyphPainter::MONO);
+    addAdditionalHamburgerComponent(std::move(stereo));
+ 
     auto bounds = getContentAreaComponent()->getLocalBounds();
-    auto wave = createWidgetAttachedTo<jcmp::MultiSwitch>(intAttachments[0]);
-    auto switchBounds = bounds.withLeft(130).withRight(185).withTop(75).withBottom(145);
-    wave->setBounds(switchBounds);
+    auto wave = createWidgetAttachedTo<jcmp::JogUpDownButton>(intAttachments[1]);
+    auto waveSwitchBounds = bounds.withLeft(5).withRight(95).withTop(bounds.getBottom() - 25).withBottom(bounds.getBottom() - 5);
+    wave->setBounds(waveSwitchBounds);
     intEditors[0] = std::make_unique<intEditor_t>(std::move(wave));
-    attachRebuildToIntAttachment(0);
-
-    int waveSwitch = intAttachments[0]->getValue();
-
+    attachRebuildToIntAttachment(1);
+    
+    int waveSwitch = intAttachments[1]->getValue();
+    
+    auto unison = createWidgetAttachedTo<jcmp::JogUpDownButton>(intAttachments[2]);
+    auto uniSwitchBounds = bounds.withLeft(105).withRight(bounds.getRight() - 5).withTop(bounds.getBottom() - 25).withBottom(bounds.getBottom() - 5);
+    unison->setBounds(uniSwitchBounds);
+    intEditors[2] = std::make_unique<intEditor_t>(std::move(unison));
+    attachRebuildToIntAttachment(2);
+    
+    int uniSwitch = intAttachments[2]->getValue();
+    
     floatEditors[0] = createWidgetAttachedTo(floatAttachments[0], floatAttachments[0]->getLabel());
-    lo::knob<50>(*floatEditors[0], 35, 5);
-
+    floatEditors[4] = createWidgetAttachedTo(floatAttachments[4], "Unison Detune");
+    
+    if (uniSwitch == 1)
+    {
+        lo::knob<45>(*floatEditors[0], 5, 5);
+    }
+    else
+    {
+        lo::knob<30>(*floatEditors[0], 5, 5);
+        lo::knob<30>(*floatEditors[4], 30, 30);
+    }
+    
     floatEditors[1] = createWidgetAttachedTo(floatAttachments[1], "Level");
-    lo::knob<50>(*floatEditors[1], 100, 5);
+    lo::knob<45>(*floatEditors[1], 130, 5);
 
     floatEditors[2] = createWidgetAttachedTo(floatAttachments[2], "Sync");
-    lo::knob<50>(*floatEditors[2], 5, 80);
-
+    lo::knob<35>(*floatEditors[2], 5, 70);
+    
     floatEditors[3] = createWidgetAttachedTo(floatAttachments[3], "Pulse Width");
-    lo::knob<50>(*floatEditors[3], 65, 80);
+    lo::knob<35>(*floatEditors[3], 55, 70);
 
-    floatEditors[4] = createWidgetAttachedTo(floatAttachments[4], floatAttachments[4]->getLabel());
-    lo::knob<50>(*floatEditors[4], 5, 80);
-
-    floatEditors[5] = createWidgetAttachedTo(floatAttachments[5], floatAttachments[5]->getLabel());
-    lo::knob<50>(*floatEditors[5], 65, 80);
-
-    floatEditors[2]->setVisible(false);
+    /* This will be useful once we have timbre params for saw and sine also.
+    
     floatEditors[3]->setVisible(false);
     floatEditors[4]->setVisible(false);
     floatEditors[5]->setVisible(false);
-
-    if (waveSwitch == 2)
-    {
-        floatEditors[2]->setVisible(true);
-        floatEditors[3]->setVisible(true);
-    }
-    else if (waveSwitch == 1)
-    {
-        floatEditors[4]->setVisible(true);
-        floatEditors[5]->setVisible(true);
-    }
+    
+    if (waveSwitch == 0) {floatEditors[3]->setVisible(true);}
+    if (waveSwitch == 1) {floatEditors[4]->setVisible(true);}
+    if (waveSwitch == 2) {floatEditors[5]->setVisible(true);}
+    */
+        
 }
 
 void ProcessorPane::layoutControlsChorus()
